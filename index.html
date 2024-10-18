@@ -9,10 +9,67 @@
     </head>
     <style>
       .btn{
-          margin-right: 15px;
+        margin-right: 15px;
+      }
+      .cart{
+        border-radius: 50%;
+        height: 50px;
+        width: 50px;
+        text-align: center;
+        top: 15px;
+        right: 25px;
+      }
+      .cart svg{
+        height: 25px;
+        fill: white;
+      }
+      .add .cart .badge{
+        right: -15px;
+        top: 2px;
+      }
+      .offcanvas.offcanvas-start{
+        width: 90%;
       }
     </style>
     <body>
+
+        <div class="add position-relative">
+          <button type="button" class="btn btn-primary cart position-absolute" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/></svg>
+            <span class="position-absolute translate-middle badge rounded-pill bg-danger">
+              0
+              <span class="visually-hidden">unread messages</span>
+            </span>
+          </button>
+        </div>
+
+        <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Add To Cart</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Age</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Password</th>
+                    <th scope="col">Address1</th>
+                    <th scope="col">Address2</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Zip</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="cart">
+
+                </tbody>
+            </table>
+          </div>
+        </div>
         
         <div class="container">
             <h1 class="text-center mt-5">CRUD Operations</h1>

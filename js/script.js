@@ -7,8 +7,10 @@ let address1 = document.getElementById('inputAddress1');
 let address2 = document.getElementById('inputAddress2'); 
 let city = document.getElementById('inputCity'); 
 let zip = document.getElementById('inputZip');
+let show = document.getElementById('show');
 
 let storage = JSON.parse(localStorage.getItem('users')) || [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 // let isValid = false;// let isIndex = null;
 
 const submitData = () => {
@@ -63,6 +65,48 @@ const submitData = () => {
     viewData();
 }
 
+const handleSelect = (id) => {
+    let selectRec = storage.find((selectData) => (
+        selectData.id == id
+    ));
+
+    let isData = cart.some(item => item.id == id)
+
+    if(!isData){
+        cart.push(selectRec);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        console.log(`User with ID ${id} added to cart.`);
+    }else{
+        alert("Data Cannot Be Same..");
+    }
+
+    viewCart();
+}
+
+const viewCart = () => {
+
+    cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    document.getElementById('cart').innerHTML = '';
+    cart.forEach((data) => {
+        document.getElementById('cart').innerHTML += `
+            <tr>
+                <td>${data.id}</td>
+                <td>${data.name}</td>
+                <td>${data.age}</td>
+                <td>${data.email}</td>
+                <td>${data.password}</td>
+                <td>${data.address1}</td>
+                <td>${data.address2}</td>
+                <td>${data.city}</td>
+                <td>${data.zip}</td>
+                <td><button class='btn text-bg-danger' onclick='removeFromCart(${data.id})'>Remove</button></td>
+            </tr>
+        `;
+    })
+    
+}
+
 const handleEdit = (id) => {
 
     let editRec = storage.find((selectRec) => (
@@ -93,10 +137,10 @@ const handleDelete = (id) => {
 
 const viewData = () => {
 
-    document.getElementById('show').innerHTML = '';
+    show.innerHTML = '';
 
     storage.forEach((rec) => {
-        document.getElementById('show').innerHTML += `<td>${rec.id}</td><td>${rec.name}</td><td>${rec.age}</td><td>${rec.email}</td><td>${rec.password}</td><td>${rec.address1}</td><td>${rec.address2}</td><td>${rec.city}</td><td>${rec.zip}</td><td><button class='btn text-bg-primary' onclick='handleEdit(${rec.id})'}>Update</button><button class='btn text-bg-danger' onclick='handleDelete(${rec.id})'}>Delete</button></td>`;
+        show.innerHTML += `<td>${rec.id}</td><td>${rec.name}</td><td>${rec.age}</td><td>${rec.email}</td><td>${rec.password}</td><td>${rec.address1}</td><td>${rec.address2}</td><td>${rec.city}</td><td>${rec.zip}</td><td><button class='btn text-bg-primary' onclick='handleSelect(${rec.id})'}>Select</button><button class='btn text-bg-success' onclick='handleEdit(${rec.id})'}>Update</button><button class='btn text-bg-danger' onclick='handleDelete(${rec.id})'}>Delete</button></td>`;
     });
 }
 viewData();
