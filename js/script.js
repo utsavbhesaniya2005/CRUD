@@ -65,53 +65,12 @@ const submitData = () => {
     viewData();
 }
 
-const handleSelect = (id) => {
-    let selectRec = storage.find((selectData) => (
-        selectData.id == id
-    ));
-
-    let isData = cart.some(item => item.id == id)
-
-    if(!isData){
-        cart.push(selectRec);
-        localStorage.setItem('cart', JSON.stringify(cart));
-        console.log(`User with ID ${id} added to cart.`);
-    }else{
-        alert("Data Cannot Be Same..");
-    }
-
-    viewCart();
-}
-
-const viewCart = () => {
-
-    cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-    document.getElementById('cart').innerHTML = '';
-    cart.forEach((data) => {
-        document.getElementById('cart').innerHTML += `
-            <tr>
-                <td>${data.id}</td>
-                <td>${data.name}</td>
-                <td>${data.age}</td>
-                <td>${data.email}</td>
-                <td>${data.password}</td>
-                <td>${data.address1}</td>
-                <td>${data.address2}</td>
-                <td>${data.city}</td>
-                <td>${data.zip}</td>
-                <td><button class='btn text-bg-danger' onclick='removeFromCart(${data.id})'>Remove</button></td>
-            </tr>
-        `;
-    })
-    
-}
 
 const handleEdit = (id) => {
 
-    let editRec = storage.find((selectRec) => (
+    let editRec = storage.find((selectRec) =>
         selectRec.id == id
-    ));
+    );
 
     name.value = editRec.name,
     age.value = editRec.age,
@@ -143,4 +102,75 @@ const viewData = () => {
         show.innerHTML += `<td>${rec.id}</td><td>${rec.name}</td><td>${rec.age}</td><td>${rec.email}</td><td>${rec.password}</td><td>${rec.address1}</td><td>${rec.address2}</td><td>${rec.city}</td><td>${rec.zip}</td><td><button class='btn text-bg-primary' onclick='handleSelect(${rec.id})'}>Select</button><button class='btn text-bg-success' onclick='handleEdit(${rec.id})'}>Update</button><button class='btn text-bg-danger' onclick='handleDelete(${rec.id})'}>Delete</button></td>`;
     });
 }
+
+const countData = () => {
+    document.getElementById('countData').innerHTML = cart.length;
+}
+
+const handleSelect = (id) => {
+    let selectRec = storage.find((selectData) => (
+        selectData.id == id
+    ));
+
+    let isData = cart.some((item) => item.id == id);
+
+    if(!isData){
+        cart.push(selectRec);
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }else{
+        alert("Data Cannot Be Same..");
+    }
+
+    viewCart();
+    countData();
+}
+
+const quantity = (id, valueChange) => {
+    cart = cart.map((data) => {
+        if(data.id == id){
+            let newQuantity = (data.quan || 1) + valueChange;
+            if (newQuantity < 1) newQuantity = 1;
+
+            return { ...data, quan: newQuantity };
+        }else{
+            return data;
+        }
+    });
+    localStorage.setItem('cart', JSON.stringify(cart));
+    viewCart();
+}
+
+const removeFromCart = (id) => {
+    storage = storage.filter((item) => item.id != id);
+    localStorage.setItem('cart', JSON.stringify(storage));
+    countData();
+    viewCart();
+}
+
+const viewCart = () => {
+
+    cart = JSON.parse(localStorage.getItem('cart')) || [];
+    document.getElementById('cart').innerHTML = '';
+
+    cart.forEach((data) => {
+        document.getElementById('cart').innerHTML += `
+            <tr>
+                <td>${data.id}</td>
+                <td>${data.name}</td>
+                <td>${data.age}</td>
+                <td>${data.email}</td>
+                <td>${data.password}</td>
+                <td>${data.address1}</td>
+                <td>${data.address2}</td>
+                <td>${data.city}</td>
+                <td>${data.zip}</td>
+                <td><a href="#" class="btn btn-success me-2" onclick="return quantity(${data.Id}, 1)">+</a>${data.quan || 1}<a href="#" class="btn btn-danger ms-2" onclick="return quantity(${data.Id}, -1)">-</a></td>
+                <td><button class='btn text-bg-danger' onclick='removeFromCart(${data.id})'>Remove</button></td>
+            </tr>
+        `;
+    });
+}
+
 viewData();
+viewCart();
+countData();
