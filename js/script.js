@@ -8,169 +8,101 @@ let address2 = document.getElementById('inputAddress2');
 let city = document.getElementById('inputCity'); 
 let zip = document.getElementById('inputZip');
 let show = document.getElementById('show');
+let selectShow = document.getElementById('cart');
 
-let storage = JSON.parse(localStorage.getItem('users')) || [];
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+const Storageget = (getData) => JSON.parse(localStorage.getItem(getData)) || [];
+let storage = Storageget('users');
+let cart = Storageget('cart');
 // let isValid = false;// let isIndex = null;
 
 const submitData = () => {
-
     event.preventDefault();
 
-    let id = inputId.value;
-
-    const addData = () => {
-        return record = {
-            id : id ? id : Math.floor(Math.random() * 1000),
-            name : name.value,
-            age : age.value,
-            email : email.value,
-            password : password.value,
-            address1 : address1.value,
-            address2 : address2.value,
-            city : city.value,
-            zip : zip.value
-        }
-    }
-
-    if(/*isValid*/id){
-
-        storage = storage.map((getId) => {
-            if(getId.id == /*isIndex*/id){
-
-                return {
-                    id : /*isIndex*/id,
-                    ...addData()
-                };
-            }else{
-
-                return getId;
-            }
-        });
-
-        // isValid = false;// isIndex = null;
-        inputId.value = '';
-    }else{
-
-        addData();
-
-        storage.push(record);
-    }
-
+    const inputIdget = inputId.value || Math.floor(Math.random() * 1000);
+    const dataObj = {Id : inputIdget, Name : name.value, Age : age.value, Email : email.value, Password : password.value, Address1 : address1.value, Address2 : address2.value, City : city.value, Zip : zip.value}
+    storage = inputId.value ? storage.map((data) => data.Id == inputIdget ? dataObj : data) : [...storage,dataObj];
+    localStorage.setItem("users",JSON.stringify(storage))
+    console.log("data object",storage);
+    viewData();
     
     name.value = age.value = email.value = password.value = address1.value =address2.value = city.value = zip.value = '';
-    
-    localStorage.setItem("users", JSON.stringify(storage));
-
-    viewData();
 }
 
 
 const handleEdit = (id) => {
+    let EditData = storage.find((data) => data.Id == id)
 
-    let editRec = storage.find((selectRec) =>
-        selectRec.id == id
-    );
-
-    name.value = editRec.name,
-    age.value = editRec.age,
-    email.value = editRec.email,
-    password.value = editRec.password,
-    address1.value = editRec.address1,
-    address2.value = editRec.address2,
-    city.value = editRec.city,
-    zip.value = editRec.zip
-
-    // isValid = true;// isIndex = id;
-    inputId.value = id;
-    
+    if(EditData){
+        ({Id : inputId.value, Name : name.value, Age : age.value, Email : email.value, Password : password.value, Address1 : address1.value, Address2 : address2.value, City : city.value, Zip : zip.value} = EditData)
+    }else{
+        alert("data not edit");
+    }
     viewData();
 }
 
-const handleDelete = (id) => {
-
-    storage = storage.filter((item) => item.id != id);
-    localStorage.setItem("users", JSON.stringify(storage));
-    viewData();
-}   
+const handleDelete = (id) => (localStorage.setItem("users",JSON.stringify(storage = storage.filter((item) => item.Id != id))),viewData())   
 
 const viewData = () => {
-
-    show.innerHTML = '';
-
-    storage.forEach((rec) => {
-        show.innerHTML += `<td>${rec.id}</td><td>${rec.name}</td><td>${rec.age}</td><td>${rec.email}</td><td>${rec.password}</td><td>${rec.address1}</td><td>${rec.address2}</td><td>${rec.city}</td><td>${rec.zip}</td><td><button class='btn text-bg-primary' onclick='handleSelect(${rec.id})'}>Select</button><button class='btn text-bg-success' onclick='handleEdit(${rec.id})'}>Update</button><button class='btn text-bg-danger' onclick='handleDelete(${rec.id})'}>Delete</button></td>`;
-    });
+    show.innerHTML = storage.map((data) =>
+        `<tr><td>${data.Id}</td>
+        <td>${data.Name}</td>
+        <td>${data.Age}</td>
+        <td>${data.Email}</td>
+        <td>${data.Password}</td>
+        <td>${data.Address1}</td>
+        <td>${data.Address2}</td>
+        <td>${data.City}</td>
+        <td>${data.Zip}</td>
+        <td><button class='btn text-bg-primary' onclick='handleSelect(${data.Id})'}>Select</button>
+        <button class='btn text-bg-success' onclick='handleEdit(${data.Id})'}>Update</button>
+        <button class='btn text-bg-danger' onclick='handleDelete(${data.Id})'}>Delete</button></td></tr>`
+    ).join('');
 }
 
-const countData = () => {
-    document.getElementById('countData').innerHTML = cart.length;
-}
+const countData = () => (document.getElementById('countData').innerHTML = cart.length);
+const tPrice = () => (cart.reduce((total, item) => total + (item.Zip || 0) * (item.quan || 1), 0));
 
 const handleSelect = (id) => {
-    let selectRec = storage.find((selectData) => (
-        selectData.id == id
-    ));
-
-    let isData = cart.some((item) => item.id == id);
-
-    if(!isData){
+    let selectRec = storage.find((selectData) => selectData.Id == id);
+    if(selectRec && !cart.some((item) => item.Id == id)){
         cart.push(selectRec);
         localStorage.setItem('cart', JSON.stringify(cart));
     }else{
         alert("Data Cannot Be Same..");
     }
-
-    viewCart();
-    countData();
+    viewCart(),countData();
 }
 
 const quantity = (id, valueChange) => {
     cart = cart.map((data) => {
-        if(data.id == id){
-            let newQuantity = (data.quan || 1) + valueChange;
-            if (newQuantity < 1) newQuantity = 1;
-
-            return { ...data, quan: newQuantity };
+        if(data.Id == id){
+            return { ...data, quan: Math.max((data.quan || 1) + valueChange, 1) };
         }else{
             return data;
         }
     });
-    localStorage.setItem('cart', JSON.stringify(cart));
-    viewCart();
+    localStorage.setItem('cart', JSON.stringify(cart)),viewCart();
 }
 
-const removeFromCart = (id) => {
-    storage = storage.filter((item) => item.id != id);
-    localStorage.setItem('cart', JSON.stringify(storage));
-    countData();
-    viewCart();
-}
+const removeFromCart = (id) => ( localStorage.setItem("cart",JSON.stringify(cart = cart.filter((item) => item.Id != id))),viewCart(),countData())
 
 const viewCart = () => {
-
-    cart = JSON.parse(localStorage.getItem('cart')) || [];
-    document.getElementById('cart').innerHTML = '';
-
-    cart.forEach((data) => {
-        document.getElementById('cart').innerHTML += `
-            <tr>
-                <td>${data.id}</td>
-                <td>${data.name}</td>
-                <td>${data.age}</td>
-                <td>${data.email}</td>
-                <td>${data.password}</td>
-                <td>${data.address1}</td>
-                <td>${data.address2}</td>
-                <td>${data.city}</td>
-                <td>${data.zip}</td>
-                <td><a href="#" class="btn btn-success me-2" onclick="return quantity(${data.Id}, 1)">+</a>${data.quan || 1}<a href="#" class="btn btn-danger ms-2" onclick="return quantity(${data.Id}, -1)">-</a></td>
-                <td><button class='btn text-bg-danger' onclick='removeFromCart(${data.id})'>Remove</button></td>
-            </tr>
-        `;
-    });
+    selectShow.innerHTML = cart.map((data) => 
+        `<tr>
+                <td>${data.Id}</td>
+                <td>${data.Name}</td>
+                <td>${data.Age}</td>
+                <td>${data.Email}</td>
+                <td>${data.Password}</td>
+                <td>${data.Address1}</td>
+                <td>${data.Address2}</td>
+                <td>${data.City}</td>
+                <td>${data.Zip}</td>
+                <td><a href="#" class="btn btn-success me-2" onclick="return quantity(${data.Id}, 1)">+</a>${data.quan || 1}<a href="#" class="btn btn-danger ms-2" onclick="return quantity(${data.Id},-1)">-</a></td>
+                <td><button class='btn text-bg-danger' onclick='removeFromCart(${data.Id})'>Remove</button></td>
+            </tr>`
+        ).join('');
+        const totalprice = tPrice();
+        document.getElementById("total-price").innerHTML = `Total Price :- ₹ ${totalprice.toFixed(2)}`;
 }
-
-viewData();
-viewCart();
-countData();
+viewData(),viewCart(),countData();
